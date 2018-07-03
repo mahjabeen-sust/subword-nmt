@@ -93,10 +93,14 @@ def learn_joint_bpe_and_vocab(args):
 
     # learn BPE on combined vocabulary
     with codecs.open(args.output.name, 'w', encoding='UTF-8') as output:
-        learn_bpe.learn_bpe(vocab_list, output, args.symbols, args.min_frequency, args.verbose, is_dict=True)
+            learn_bpe.learn_bpe(vocab_list, output, args.symbols, args.min_frequency, args.verbose, is_dict=True)
+    #closing output
+    output.close()
 
     with codecs.open(args.output.name, encoding='UTF-8') as codes:
         bpe = apply_bpe.BPE(codes, separator=args.separator)
+    #closing codes
+    codes.close() 
 
     # apply BPE to each training corpus and get vocabulary
     for train_file, vocab_file in zip(args.input, args.vocab):
@@ -121,6 +125,11 @@ def learn_joint_bpe_and_vocab(args):
         for key, freq in sorted(vocab.items(), key=lambda x: x[1], reverse=True):
             vocab_file.write("{0} {1}\n".format(key, freq))
         vocab_file.close()
+    #closing all opened files
+    for f in args.input:
+        f.close()
+    for f in args.vocab:
+        f.close()
 
 
 if __name__ == '__main__':
